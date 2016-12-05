@@ -3,10 +3,12 @@ package com.helperdemo.activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -28,6 +30,7 @@ public class UnInStallActivity extends BaseActivity {
     public RecyclerView recyclerView;
     public List<Map<String, Object>> appList;
     public AppListAdapter appListAdapter;
+    public MonitorSysReceiver monitorSysReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +49,19 @@ public class UnInStallActivity extends BaseActivity {
 
     public void init() {
         appList = BaseUtil.getAppList(this);
-//        Map<String, Object> map = list.get(0);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         appListAdapter = new AppListAdapter();
         recyclerView.setAdapter(appListAdapter);
+        monitorSysReceiver = new MonitorSysReceiver();
+        IntentFilter filter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addDataScheme("package");
+        this.registerReceiver(monitorSysReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(monitorSysReceiver);
     }
 
     class AppListAdapter extends RecyclerView.Adapter<AppListViewHolder> {
@@ -100,7 +112,15 @@ public class UnInStallActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent){
             if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
-                appListAdapter.notifyDataSetChanged();
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        appListAdapter.notifyDataSetChanged();
+                        appList.clear();
+                        appList = BaseUtil.getAppList(getBaseContext());
+                    }
+                });
             }
         }
     }
