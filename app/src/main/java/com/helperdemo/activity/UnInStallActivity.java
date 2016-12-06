@@ -26,42 +26,46 @@ import java.util.Map;
 
 public class UnInStallActivity extends BaseActivity {
 
-    public ImageView imageView;
+    public ImageView back;
     public RecyclerView recyclerView;
     public List<Map<String, Object>> appList;
     public AppListAdapter appListAdapter;
-    public MonitorSysReceiver monitorSysReceiver;
+    public UnInStallActivityReceiver unInStallActivityReceiver;
+
+    public int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uninstall);
-        imageView = (ImageView) findViewById(R.id.back);
+        back = (ImageView) findViewById(R.id.back);
         recyclerView = (RecyclerView) findViewById(R.id.app_list);
-        imageView.setOnClickListener(new View.OnClickListener() {
+        back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
+
         init();
     }
 
-    public void init() {
+    private void init() {
         appList = BaseUtil.getAppList(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         appListAdapter = new AppListAdapter();
         recyclerView.setAdapter(appListAdapter);
-        monitorSysReceiver = new MonitorSysReceiver();
+
+        unInStallActivityReceiver = new UnInStallActivityReceiver();
         IntentFilter filter = new IntentFilter(Intent.ACTION_PACKAGE_REMOVED);
         filter.addDataScheme("package");
-        this.registerReceiver(monitorSysReceiver, filter);
+        this.registerReceiver(unInStallActivityReceiver, filter);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(monitorSysReceiver);
+        unregisterReceiver(unInStallActivityReceiver);
     }
 
     class AppListAdapter extends RecyclerView.Adapter<AppListViewHolder> {
@@ -97,18 +101,23 @@ public class UnInStallActivity extends BaseActivity {
             appName = (TextView) itemView.findViewById(R.id.app_name);
             appVersion = (TextView) itemView.findViewById(R.id.app_version);
             button = (Button) itemView.findViewById(R.id.uninstall);
+            initListener();
+        }
+
+        public void initListener() {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Uri packageURI = Uri.parse("package:" + appList.get(getLayoutPosition()).get("package_name"));
                     Intent intent = new Intent(Intent.ACTION_DELETE, packageURI);
                     startActivity(intent);
+                    position = getLayoutPosition();
                 }
             });
         }
     }
 
-    public class MonitorSysReceiver extends BroadcastReceiver {
+    public class UnInStallActivityReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent){
             if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
@@ -116,9 +125,8 @@ public class UnInStallActivity extends BaseActivity {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
+                        appList.remove(position);
                         appListAdapter.notifyDataSetChanged();
-                        appList.clear();
-                        appList = BaseUtil.getAppList(getBaseContext());
                     }
                 });
             }

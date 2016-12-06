@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.os.Environment;
+import android.util.Log;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,7 +43,6 @@ public class BaseUtil {
 
         int count = packageinfo.size();
         for(int i = 0; i < count; i++){
-
             PackageInfo pinfo = packageinfo.get(i);
             ApplicationInfo appInfo = pinfo.applicationInfo;
             if (appInfo.packageName.equals("com.helperdemo")) {
@@ -60,5 +63,38 @@ public class BaseUtil {
             }
         }
         return listItems;
+    }
+
+    public static void FindAllAPKFile(File file, Context context, List<Map<String, Object>> listItems) {
+        if (file.isFile()) {
+            String apk_name = file.getName();
+            String apk_path;
+            if (apk_name.toLowerCase().endsWith(".apk")) {
+                apk_path = file.getAbsolutePath();// apk文件的绝对路劲
+
+                PackageManager pm = context.getPackageManager();
+                PackageInfo packageInfo = pm.getPackageArchiveInfo(apk_path, PackageManager.GET_ACTIVITIES);
+                ApplicationInfo appInfo = packageInfo.applicationInfo;
+
+                //修复apk图标BUG
+                appInfo.sourceDir = apk_path;
+                appInfo.publicSourceDir = apk_path;
+
+                Map<String, Object> map = new HashMap<>();
+                map.put("app_logo", appInfo.loadIcon(context.getPackageManager()));
+                map.put("app_name", appInfo.loadLabel(context.getPackageManager()));
+                map.put("app_version_name", packageInfo.versionName);
+                map.put("package_name", appInfo.packageName);
+                map.put("apk_path", apk_path);
+                listItems.add(map);
+            }
+        } else {
+            File[] files = file.listFiles();
+            if (files != null && files.length > 0) {
+                for (File file_str : files) {
+                    FindAllAPKFile(file_str, context, listItems);
+                }
+            }
+        }
     }
 }

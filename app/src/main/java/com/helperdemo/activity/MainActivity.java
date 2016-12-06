@@ -1,6 +1,7 @@
 package com.helperdemo.activity;
 
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import com.helperdemo.base.BaseActivity;
 public class MainActivity extends BaseActivity {
 
     public RecyclerView recyclerView;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +25,7 @@ public class MainActivity extends BaseActivity {
         init();
     }
 
-    public void init() {
+    private void init() {
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         ClearItemAdapter clearItemAdapter = new ClearItemAdapter();
         recyclerView.setAdapter(clearItemAdapter);
@@ -31,11 +33,15 @@ public class MainActivity extends BaseActivity {
 
     private void onClearItemClick(ClearItem clearItem) {
         switch (clearItem.name) {
-            case "手机清理":
+            case "应用安装":
+                intent = new Intent(this,InStallActivity.class);
+                startActivity(intent);
                 break;
             case "应用卸载":
-                Intent intent = new Intent(this,UnInStallActivity.class);
+                intent = new Intent(this,UnInStallActivity.class);
                 startActivity(intent);
+                break;
+            case "手机清理":
                 break;
         }
     }
@@ -54,7 +60,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public int getItemCount() {
-            return 2;
+            return clearItems.length;
         }
     }
 
@@ -74,8 +80,9 @@ public class MainActivity extends BaseActivity {
     }
 
     ClearItem[] clearItems = new ClearItem[]{
+            new ClearItem("应用安装"),
+            new ClearItem("应用卸载"),
             new ClearItem("手机清理"),
-            new ClearItem("应用卸载")
     };
 
     class ClearItem {

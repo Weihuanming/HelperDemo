@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.helperdemo">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,12 +18,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.UnInStallActivity"></activity>
-        <receiver android:name=".activity.UnInStallActivity$MonitorSysReceiver">
+        <activity android:name=".activity.UnInStallActivity" />
+        <activity android:name=".activity.InStallActivity"></activity>
+
+        <receiver android:name=".activity.UnInStallActivity$UnInStallActivityReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>
