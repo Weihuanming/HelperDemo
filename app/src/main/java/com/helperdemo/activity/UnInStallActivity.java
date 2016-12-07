@@ -121,14 +121,8 @@ public class UnInStallActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent){
             if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        appList.remove(position);
-                        appListAdapter.notifyDataSetChanged();
-                    }
-                });
+                appList.remove(position);
+                appListAdapter.notifyDataSetChanged();
             }
         }
     }

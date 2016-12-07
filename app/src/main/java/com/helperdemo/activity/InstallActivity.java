@@ -21,8 +21,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.helperdemo.R;
+import com.helperdemo.base.BaseActivity;
 import com.helperdemo.util.BaseUtil;
 
 import java.io.File;
@@ -30,9 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class InStallActivity extends AppCompatActivity {
+public class InStallActivity extends BaseActivity {
 
     public ImageView back;
+    public TextView textView;
     public RecyclerView recyclerView;
     public List<Map<String, Object>> apkList = new ArrayList<>();
     public ApkListAdapter apkListAdapter;
@@ -42,6 +45,7 @@ public class InStallActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_install);
         back = (ImageView) findViewById(R.id.back);
+        textView = (TextView) findViewById(R.id.none_apk);
         recyclerView = (RecyclerView) findViewById(R.id.apk_list);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +58,11 @@ public class InStallActivity extends AppCompatActivity {
 
     private void init() {
         BaseUtil.FindAllAPKFile(Environment.getExternalStorageDirectory(), getBaseContext(), apkList);
+        if (apkList.isEmpty()) {
+            textView.setVisibility(View.VISIBLE);
+        } else {
+            textView.setVisibility(View.GONE);
+        }
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         apkListAdapter = new ApkListAdapter();
         recyclerView.setAdapter(apkListAdapter);
@@ -125,10 +134,13 @@ public class InStallActivity extends AppCompatActivity {
                 .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String path = apkList.get(position).get("apk_path").toString();
-                        path = path.replace("/storage/emulated/0/","/sdcard/");
+                        String path = (String) apkList.get(position).get("apk_path");
                         File file = new File(path);
-                        file.delete();
+                        if (file.delete()) {
+                            Toast.makeText(getBaseContext(), "删除成功", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getBaseContext(), "删除失败", Toast.LENGTH_SHORT).show();
+                        }
                         dialog.dismiss();
                     }
                 })

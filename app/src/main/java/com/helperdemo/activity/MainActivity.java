@@ -11,17 +11,20 @@ import android.widget.TextView;
 
 import com.helperdemo.R;
 import com.helperdemo.base.BaseActivity;
+import com.helperdemo.util.BaseUtil;
 
 public class MainActivity extends BaseActivity {
 
     public RecyclerView recyclerView;
+    public TextView textView;
     private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = (RecyclerView)findViewById(R.id.content);
+        recyclerView = (RecyclerView) findViewById(R.id.content);
+        textView = (TextView) findViewById(R.id.version);
         init();
     }
 
@@ -29,6 +32,7 @@ public class MainActivity extends BaseActivity {
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         ClearItemAdapter clearItemAdapter = new ClearItemAdapter();
         recyclerView.setAdapter(clearItemAdapter);
+        textView.setText("Version: " + BaseUtil.getAppVersionName(this));
     }
 
     private void onClearItemClick(ClearItem clearItem) {
@@ -40,8 +44,6 @@ public class MainActivity extends BaseActivity {
             case "应用卸载":
                 intent = new Intent(this,UnInStallActivity.class);
                 startActivity(intent);
-                break;
-            case "手机清理":
                 break;
         }
     }
@@ -82,7 +84,6 @@ public class MainActivity extends BaseActivity {
     ClearItem[] clearItems = new ClearItem[]{
             new ClearItem("应用安装"),
             new ClearItem("应用卸载"),
-            new ClearItem("手机清理"),
     };
 
     class ClearItem {

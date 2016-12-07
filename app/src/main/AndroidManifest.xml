@@ -19,14 +19,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.UnInStallActivity" />
-        <activity android:name=".activity.InStallActivity"></activity>
+        <activity android:name=".activity.InStallActivity" />
 
         <receiver android:name=".activity.UnInStallActivity$UnInStallActivityReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>
